@@ -1,32 +1,34 @@
 @startuml
-class user{
+' 用户和群聊
+class entity{
     +int id <<PK>> 
     +bool is_group
     +string display_id 
     +String name
     +String avatar
-    +int online_status
+    +tiny_int online_status
     +String status  
     +String introduction 
+    +int group_owner_id  <<FK>>
 }
-class settings{
+class user_setting{
     +int user_id <<FK>> 
     ' 个人信息
     +Date birthday
-    +int sex
+    +tiny_int sex
     ' 通用设置
     +int font_size
     +String font_style
     +String theme
     +String background
-    +int receive_notice
-    +int notice_sound
+    +bool receive_notice
+    +String notice_sound
     ' 安全设置
     +String password
     +String email
-    +int create_time
-    +int update_time
-    +int is_deleted
+    +DateTime create_time
+    +DateTime last_login_time
+    +tiny_int is_deleted
     ' 隐私设置
     +bool found_by_account_id
     +bool found_by_nickname
@@ -35,12 +37,38 @@ class settings{
     +bool allow_stranger_message
     +bool is_invisible
 }
-class chats{
+class group_member_info{
+    +int group_id <<FK>> 
+    +int user_id <<FK>> 
+    +String group_nickname
+    +bool is_banned
+    +bool is_manager
+}
+class group_setting{
+    +int group_id <<FK>>  
+    +bool allow_found_by_id
+    +bool allow_found_by_name
+    +bool allow_member_invite
+    ' enum: no_auth, message_auth, question_auth
+    +tiny_int join_auth_method
+    +bool allow_direct_invite
+    +String auth_question
+    +String auth_answer
+}
+class group_notice{
+    +int id <<PK>> 
+    +int group_id <<FK>> 
+    +int sender_id <<FK>> 
+    +String content
+    +tiny_int content_type
+    +DateTime create_time
+}
+class chat{
     +int id <<PK>>
     +int user_id <<FK>>
     ' 对方的id
     +int target_id
-    +int unread_count
+    +tiny_int unread_count
     +String last_message
     +DateTime last_time
     +bool is_pinned
@@ -51,18 +79,135 @@ class chats{
     +int tag2_id
     +int tag3_id
 }
-class chats_tag{
+class chat_tag{
     +int user_id <<PK>> <<FK>>
     +String name
 }
-class messages{
+class message{
     +int id <<PK>>
-    +int sender_id <<FK>>
-    +int receiver_id <<FK>>
+    +int sender_id 
+    +int receiver_id 
     +String content
+    +tiny_int content_type
     +DateTime time
+    +bool is_recall
+    ' 对消息的操作
+    +tiny_int operation
+    +int op_message_id
+}
+class multiple_message{
+    +int id 
+    +int message_id
+}
+class deleted_message{
+    +int user_id <<FK>>
+    +int start_message_id <<FK>>
+    +int end_message_id <<FK>>
+}
+class contact{
+    +int user_id <<PK>> 
+    +int target_id <<PK>> 
+    +String remark
+    +int divide_id
+    +bool is_blacklisted
+    +String background_img
+}
+class friend_divide{
+    +int id <<PK>>
+    +int user_id 
+    +String name
+}
+class group_divide{
+    +int id <<PK>>
+    +int group_id 
+    +String name
+}
+class friend_application{
+    +int id <<PK>>
+    +int sender_id 
+    +int receiver_id 
+    +String reason
+    +DateTime time
+    ' 0:未处理 1:已同意 2:已拒绝 3:已忽略
+    +tiny_int status
+}
+class group_notification{
+    +int id <<PK>>
+    +int group_id 
+    +int sender_id 
+    +int receiver_id 
+    ' 0:申请 1:邀请 2:邀请后的申请 3:通知
+    +tiny_int type
+    +String reason
+    +DateTime time
+    ' 0:未处理 1:已同意 2:已拒绝 3:已忽略 4:已撤销
+    +tiny_int status
+    ' （用于邀请后的申请）0:未处理 1:已同意 2:已拒绝 3:已忽略
+    +tiny_int pend_status
+}
+class note{
+    +int id <<PK>>
+    +int user_id 
+    +String name
+    +String save_path
+    +String details
+    +DateTime create_time
+    +DateTime update_time
+    +bool is_deleted
+    +int tag1_id
+    +int tag2_id
+    +int tag3_id
+}
+class note_tag{
+    +int id <<PK>>
+    +int user_id <<FK>>
+    +String name
+}
+class code{
+    +int id <<PK>>
+    +int user_id <<FK>>
+    +String name
+    +String save_path
+    +String details
+    +DateTime create_time
+    +DateTime update_time
+    +bool is_deleted
+    +int tag1_id
+    +int tag2_id
+    +int tag3_id
+}
+class code_tag{
+    +int id <<PK>>
+    +int user_id <<FK>>
+    +String name
+}
+class favorite{
+    +int id
+    +int user_id
+    ' 0:消息 1:多选消息 2:笔记 3:代码 
     +int type
-    +int status
-    +int is_deleted
+    ' 在对应的表中的id
+    +int target_id
+}
+class favorite_tag{
+    +int id <<PK>>
+    +int user_id 
+    +String name
+}
+class recycle_bin{
+    +int user_id <<FK>>
+    ' 0:笔记 1:代码
+    +int type
+    +int target_id
+}
+class schedules{
+    +int id
+    +int user_id
+    +String title
+    +String details
+    +DateTime start_time
+    +DateTime end_time
+    +bool need_remind
+    +String color
 }
 @enduml
