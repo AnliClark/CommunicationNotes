@@ -1,0 +1,68 @@
+@startuml
+class user{
+    +int id <<PK>> 
+    +bool is_group
+    +string display_id 
+    +String name
+    +String avatar
+    +int online_status
+    +String status  
+    +String introduction 
+}
+class settings{
+    +int user_id <<FK>> 
+    ' 个人信息
+    +Date birthday
+    +int sex
+    ' 通用设置
+    +int font_size
+    +String font_style
+    +String theme
+    +String background
+    +int receive_notice
+    +int notice_sound
+    ' 安全设置
+    +String password
+    +String email
+    +int create_time
+    +int update_time
+    +int is_deleted
+    ' 隐私设置
+    +bool found_by_account_id
+    +bool found_by_nickname
+    +bool found_by_group
+    +bool found_by_friend
+    +bool allow_stranger_message
+    +bool is_invisible
+}
+class chats{
+    +int id <<PK>>
+    +int user_id <<FK>>
+    ' 对方的id
+    +int target_id
+    +int unread_count
+    +String last_message
+    +DateTime last_time
+    +bool is_pinned
+    +bool is_mute
+    +bool is_blocked
+    +bool is_deleted
+    +int tag1_id
+    +int tag2_id
+    +int tag3_id
+}
+class chats_tag{
+    +int user_id <<PK>> <<FK>>
+    +String name
+}
+class messages{
+    +int id <<PK>>
+    +int sender_id <<FK>>
+    +int receiver_id <<FK>>
+    +String content
+    +DateTime time
+    +int type
+    +int status
+    +int is_deleted
+}
+@enduml
